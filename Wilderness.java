@@ -9,25 +9,22 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public class Wilderness extends JFrame implements ActionListener
 {
 	JLabel question = new JLabel(); // 題目
-	JRadioButton a = new JRadioButton("A");
+	JRadioButton a = new JRadioButton("A");//選項按鈕
 	JRadioButton b = new JRadioButton("B");
 	JRadioButton c = new JRadioButton("C");
 	JRadioButton d = new JRadioButton("D");
-	JLabel background = new JLabel();
-	ImageIcon icon = new ImageIcon("wild.jpg");
+	ImageIcon icon = new ImageIcon("wild.jpg");//背景圖
 	int rd = 0; // 隨機題目
 	Boolean correct = false; // 回答正確與否
 	int qq = 0; // 第幾題
 	int score = 0; //本次積分
 	int maxScr = 2; //初始值
 	Dimension frameSize = new Dimension(1000, 800);
-	boolean s = false;
+	boolean s = false;//成功與否
 	
 	ArrayList<String[]> historyQ = new ArrayList<String[]>();
 	File history = new File("history.TXT");//打開題目庫
@@ -46,7 +43,7 @@ public class Wilderness extends JFrame implements ActionListener
 		this.setLocationRelativeTo(null);
 		this.setUndecorated(true);
 		
-		readFile(history, historyQ);
+		readFile(history, historyQ);//讀取問題和答案
 		readFile(english, englishQ);
 		readFile(sword, swordQ);
 		readFile(geography, geographyQ);
@@ -56,11 +53,11 @@ public class Wilderness extends JFrame implements ActionListener
 	public void actionPerformed(ActionEvent e) {
 		qq++;
 		if(e.getSource() == a) {
-			a.setForeground(Color.red);
-			if(rd/3 == 0) correct = true;
-			else correct = false;
+			a.setForeground(Color.red);//如果被點擊則變換文字顏色
+			if(rd/3 == 0) correct = true;//判斷問題答案
+			else correct = false;//確認是否答對
 		}
-		else a.setForeground(Color.black);
+		else a.setForeground(Color.black);//點選其他按鈕，文字變為黑色
 		if(e.getSource() == b) {
 			b.setForeground(Color.red);
 			if(rd/3 == 1) correct = true;
@@ -80,15 +77,15 @@ public class Wilderness extends JFrame implements ActionListener
 		}
 		else d.setForeground(Color.black);
 		
-		a.removeActionListener(this);//監聽動作
+		a.removeActionListener(this);//去除監聽動作
 		b.removeActionListener(this);
 		c.removeActionListener(this);
 		d.removeActionListener(this);
 		
-		if(correct) score++;
+		if(correct) score++;//如果答對則加積分
 		switch(qq) {
 		case 1:
-			setQ(englishQ);
+			setQ(englishQ);//第2題的問題
 			break;
 		case 2:
 			setQ(swordQ);
@@ -100,26 +97,26 @@ public class Wilderness extends JFrame implements ActionListener
 			setQ(bigQ);
 			break;
 		case 5:
-			if(score > maxScr) {
+			if(score > maxScr) {//如果超過城主積分->挑戰成功
 				maxScr = score;
 				s = true;
 			}
 			
-			dispose();
+			dispose();//關閉視窗
 			break;
 		}
 	}
 	
 	public boolean success() {
-		return s;
+		return s;//回傳成功與否
 	}
 	
 	public void start() { // 開始遊戲
 		correct = false; // 回答正確與否
 		qq = 0; // 第幾題
 		score = 0;//積分歸零
-		s = false;
-		build();
+		s = false;//預設
+		build();//建立視窗
 		this.setVisible(true);//視窗顯示	
 		setQ(historyQ);//從歷史開始
 	}
@@ -170,14 +167,9 @@ public class Wilderness extends JFrame implements ActionListener
 		b.setText("B " +  questions.get(rd)[2] + " ");
 		c.setText("C " +  questions.get(rd)[3] + " ");
 		d.setText("D " +  questions.get(rd)[4] + " ");
-		System.out.println(questions.get(rd)[0]);
-		System.out.println(questions.get(rd)[1]);
-		System.out.println(questions.get(rd)[2]);
-		System.out.println(questions.get(rd)[3]);
-		System.out.println(questions.get(rd)[4]);
 	}
 	
-	private void readFile(File file, ArrayList<String[]> questions) {
+	private void readFile(File file, ArrayList<String[]> questions) {//讀問題檔
 		try {
 			Scanner scn = new Scanner(file);
 			while(scn.hasNextLine()) {

@@ -18,33 +18,39 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
+
 public class WChoose extends JFrame
 {
 	String name = "荒野";//地塊名稱
-	String master = "";//成主名稱
-	int passCost = 40;
-	int costs = 0;
-	Wilderness wd = new Wilderness();
-	JLabel maxSc = new JLabel("目前記錄 : " + Integer.toString(wd.maxScr) + "題");
-	String player;
+	public int master = 0;//城主名稱
+	int passCost = 40;//過路費
+	int costs = 0;//當玩家消耗的經驗值
+	public Wilderness wd = new Wilderness();//問答
+	JLabel maxSc = new JLabel("目前記錄 : " + Integer.toString(wd.maxScr) + "題");//顯示目前最高紀錄
+	int player;//第幾位玩家
+	int i; // 第幾塊土地
+	public Boolean chooseP = false;//是否選擇挑戰
+	Boolean s = false;//是否成功
 	
-	public WChoose() {
-		this.setSize(500,400);
+	
+	public WChoose(int i) {
+		this.i = i;
+		this.setSize(500,400);//視窗大小
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation((int)(screenSize.getWidth()/2 - this.getWidth()/2), (int)(screenSize.getHeight()/2 - this.getHeight()/2));
-		this.setUndecorated(true);
+		this.setLocation((int)(screenSize.getWidth()/2 - this.getWidth()/2), (int)(screenSize.getHeight()/2 - this.getHeight()/2));//視窗置中
+		this.setUndecorated(true);//關閉外框
 	}
 	
-	public void enter(String playerName) {
-		setTitle(name);//
-		maxSc.setText("目前記錄 : " + Integer.toString(wd.maxScr) + "題");//
+	public void enter(int playerName) {
+		setTitle(name);//城池名稱
+		maxSc.setText("目前記錄 : " + Integer.toString(wd.maxScr) + "題");
 		costs = 0;//初始化
-		if(playerName.equals(master)) {//城主->過路費增加
-			passCost *= 2;
-			build1();
+		if(playerName == master) {//城主->過路費增加
+			passCost *= 2;//過路費翻倍
+			build1();//建立畫面
 			this.setVisible(true);
 		}
-		else {
+		else {//非城主->選擇
 			player = playerName;
 			build2();
 			this.setVisible(true);
@@ -53,7 +59,7 @@ public class WChoose extends JFrame
 	
 	//過路費增加
 	public void build1() {
-		Font font = new Font("芫荽", Font.BOLD, 60);	
+		Font font = new Font("芫荽", Font.BOLD, 60);	//字體
 		JLabel cost = new JLabel("過路費PLUS!");
 		cost.setFont(font);
 		cost.setForeground(Color.yellow);
@@ -63,12 +69,14 @@ public class WChoose extends JFrame
 		cost.setOpaque(true);
 		this.setLayout(null);		
 		this.add(cost);
+		//延遲1秒關閉
 		Timer timer = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
 		timer.start();
+		//如果關閉視窗，便關閉timer
 		this.addWindowListener (new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
 				timer.stop();
@@ -78,6 +86,7 @@ public class WChoose extends JFrame
 	
 	//選擇視窗
 	public void build2() {
+		chooseP = false;//初始化
 		JButton pass = new JButton("過路費");
 		JButton challenge = new JButton("入場費");
 		ImageIcon icon = new ImageIcon("wild.jpg");//背景圖
@@ -138,7 +147,10 @@ public class WChoose extends JFrame
 		maxSc.setHorizontalAlignment(SwingConstants.CENTER);
 		maxSc.setOpaque(true);
 				
-		if(name.equals("荒野")) pass.setText("放棄");
+		if(name.equals("荒野")) {//如果是荒野地塊，便修改選項
+			pass.setText("放棄");
+			challenge.setText("佔領");
+		}
 		
 		this.add(pass);
 		this.add(challenge);
@@ -148,38 +160,39 @@ public class WChoose extends JFrame
 		this.add(ruleB);
 		this.add(maxSc);
 		
-		pass.addActionListener(new ActionListener() {
+		pass.addActionListener(new ActionListener() {//選擇放棄或是過路費
 			public void actionPerformed(ActionEvent e) {
-				costs = passCost;
-				passChoose pc = new passChoose(passCost);
-				dispose();
+				s = false;//未挑戰->未成功
+				costs = passCost;//消耗值為過路費
+				passChoose pc = new passChoose(passCost);//跳出視窗顯示消耗值
+				dispose();//關閉選擇視窗
 			}
 		});
-		challenge.addActionListener(new ActionListener() {
+		challenge.addActionListener(new ActionListener() {//選擇入場費或是佔領
 			public void actionPerformed(ActionEvent e) {
-				costs = passCost*2;//入場費
-				passChoose pc = new passChoose(passCost*2);//跳出入場費視窗
-				dispose();
-				pc.addWindowListener(new WindowAdapter(){//關閉後
+				chooseP = true;//選擇挑戰
+				s = false;//預設為失敗
+				costs = passCost*2;//入場費是過路費的2倍
+				passChoose pc = new passChoose(passCost*2); // 跳出入場費視窗
+				dispose();//關閉選擇視窗
+				pc.addWindowListener(new WindowAdapter(){ // 關閉後
 					public void windowClosed(WindowEvent e) {
 						wd.start();//問答顯示
-						pc.removeWindowListener(this);
+						pc.removeWindowListener(this);//移除監聽
 					}
 				});
-				
 				wd.addWindowListener(new WindowAdapter(){//問答結束
 					public void windowClosed(WindowEvent e) {
-						wFinish wf = new wFinish(wd.success());
-						wf.addWindowListener(new WindowAdapter() {
+						s = wd.success();//確認是否成功
+						wFinish wf = new wFinish(wd.success());//顯示結果視窗
+						wf.addWindowListener(new WindowAdapter() {//結果視窗關閉後
 							public void windowClosed(WindowEvent e) {
-								if(wd.success()) {//若是挑戰成功
+								if(wd.success()) {// 若是挑戰成功
 									rename rn = new rename();//輸入新城名
 									rn.addWindowListener(new WindowAdapter() {//輸入後再改城名
 										public void windowClosed(WindowEvent e) {
 											name = rn.getName() + "城";//
-											master = player;//
-											System.out.println("Master : " + master);
-											System.out.println("Castle : " + name);
+											master = player;//修改城主名稱
 											rn.removeWindowListener(this);
 										}
 									});
@@ -187,7 +200,7 @@ public class WChoose extends JFrame
 								wf.removeWindowListener(this);
 							}
 						});
-						wd.getContentPane().removeAll();
+						wd.getContentPane().removeAll();//畫面清除
 						wd.removeWindowListener(this);
 					}
 				});
@@ -216,7 +229,6 @@ public class WChoose extends JFrame
             this.d = d;
             this.image = image;
         }
-
         
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -228,4 +240,9 @@ public class WChoose extends JFrame
 	public int getCost() {
 		return costs;
 	}
+	//回傳是否挑戰成功
+	public boolean successful() {
+		return s;
+	}
+
 }

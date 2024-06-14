@@ -16,6 +16,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import game.MainGameFrame;
+
 public class begin {
 
 	static JButton hajime = new JButton("遊戲開始");
@@ -55,21 +57,18 @@ public class begin {
 		beginF.add(gameName);
 		beginF.add(ruleB);
 		
-		hajime.addActionListener(new ActionListener() {
+		hajime.addActionListener(new ActionListener() {//偵測是否開始遊戲
 			public void actionPerformed(ActionEvent e) {
 				beginF.dispose();
+				new MainGameFrame();
 			}
 		});
 		
-		ruleB.addActionListener(new ActionListener() {
+		ruleB.addActionListener(new ActionListener() {//偵測遊戲規則按鈕
 			public void actionPerformed(ActionEvent e) {
 				rule r = new rule("beginning");
 			}
 		});
-	}
-	
-	public static void main(String[] args) {
-		begin b = new begin();
 	}
 	
 	static class ImagePanel extends JPanel {

@@ -47,7 +47,4 @@ public class rename extends JFrame implements ActionListener{
 			timer.start();
 		}
 	}
-	
-	
-
 }
